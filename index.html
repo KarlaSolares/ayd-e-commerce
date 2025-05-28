@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A&D Suministros de Repostería y Panadería</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@storyblok/js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="LOGO A&D.png" alt="A&D Suministros de Repostería y Panadería Logo" class="store-logo-header">
+            <h1>A&D Suministros de Repostería y Panadería</h1>
+        </div>
+        <nav>
+            <button id="viewCartBtn">Ver Carrito</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="user-interface" class="interface active">
+            <h2>Nuestros Productos</h2>
+            <div id="category-filters" class="category-filters">
+                <button class="filter-btn active" data-category="all">Todas las Categorías</button>
+            </div>
+            <div id="product-list" class="product-grid">
+                </div>
+
+            <div id="cart-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button cart-close">&times;</span>
+                    <h3>Tu Carrito</h3>
+                    <ul id="cart-items"></ul>
+                    <p>Total: Q <span id="cart-total">0.00</span></p>
+                    <button id="checkoutBtn">Finalizar Compra</button>
+                </div>
+            </div>
+
+            <div id="image-modal" class="modal">
+                <div class="modal-content image-modal-content">
+                    <span class="close-button image-close">&times;</span>
+                    <img id="modal-image" src="" alt="Imagen de Producto Grande">
+                </div>
+            </div>
+
+            <div id="payment-modal" class="modal">
+                <div class="modal-content payment-modal-content">
+                    <span class="close-button payment-close">&times;</span>
+                    <h3>Selecciona tu método de pago</h3>
+                    <div class="payment-options">
+                        <button id="payCashBtn">Efectivo</button>
+                        <button id="payTransferBtn">Transferencia</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
