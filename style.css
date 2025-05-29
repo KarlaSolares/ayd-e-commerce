@@ -6,6 +6,7 @@
     --lila-dulce: #DCD0FF;
     --texto-oscuro: #4A4A4A;
     --borde-claro: #E0E0E0;
+    --beige-suave-mas-claro: #FDF5E6; /* Para la sección de contacto, si se desea un tono diferente */
 }
 
 body {
@@ -28,12 +29,11 @@ header {
 .logo-container {
     display: flex;
     align-items: center;
-    gap: 15px; /* Espacio entre el logo y el título */
-    
+    gap: 15px;
 }
 
 .store-logo-header {
-    height: 60px; /* Tamaño del logo en el header */
+    height: 60px;
     width: auto;
 }
 
@@ -56,7 +56,7 @@ nav button {
 }
 
 nav button:hover {
-    background-color: #B2A2FF; /* Un lila un poco más oscuro */
+    background-color: #B2A2FF;
 }
 
 main {
@@ -69,18 +69,87 @@ main {
 }
 
 .interface {
-    display: none; /* Oculta todas las interfaces por defecto */
+    display: none; 
 }
 
 .interface.active {
-    display: block; /* Muestra la interfaz activa */
+    display: block;
 }
 
-h2, h3, h4 {
+h2 { /* Estilo general para H2 principal de secciones */
     color: var(--cafe-claro);
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Más espacio para el título principal de la sección */
+    font-size: 2em; /* Un poco más grande */
 }
+
+h3 { /* Estilo para H3 como el del carrito y títulos de producto */
+    color: var(--cafe-claro); /* Manteniendo el color café claro */
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* --- Estilos para los filtros de categoría --- */
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px; /* Más espacio después de los filtros */
+    padding: 10px;
+    background-color: var(--lila-dulce); 
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.category-filters .filter-btn {
+    background-color: var(--lila-dulce); 
+    color: white; 
+    border: none; 
+    padding: 10px 15px; 
+    border-radius: 5px; 
+    cursor: pointer;
+    font-size: 1em; 
+    transition: background-color 0.3s ease, transform 0.2s ease; 
+}
+
+.category-filters .filter-btn:hover {
+    background-color: #B2A2FF; 
+    transform: translateY(-2px); 
+}
+
+.category-filters .filter-btn.active {
+    background-color: var(--rosa-pastel); 
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 0 8px rgba(0,0,0,0.2); 
+    transform: none; 
+}
+
+/* Estilos para la Barra de Búsqueda */
+.search-container {
+    margin: 0 auto 30px auto; /* Centrado y con margen inferior */
+    max-width: 700px; 
+    padding: 0 15px; 
+}
+
+#searchBar {
+    width: 100%;
+    padding: 12px 20px; /* Un poco más de padding */
+    font-size: 1em;
+    border: 1px solid var(--borde-claro);
+    border-radius: 25px; 
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+#searchBar:focus {
+    outline: none;
+    border-color: var(--lila-dulce);
+    box-shadow: 0 0 0 3px rgba(220, 208, 255, 0.4); /* Sombra exterior al enfocar */
+}
+
 
 .product-grid {
     display: grid;
@@ -99,34 +168,38 @@ h2, h3, h4 {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición suave para hover */
 }
 
-.product-item .main-image { /* Estilo para la imagen principal del producto */
+.product-item:hover {
+    transform: translateY(-5px); /* Ligera elevación al pasar el mouse */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+}
+
+.product-item .main-image {
     max-width: 100%;
     height: 180px;
     object-fit: cover;
     border-radius: 4px;
     margin-bottom: 10px;
-    cursor: zoom-in; /* Indica que la imagen es clicable para ver en grande */
-    transition: transform 0.2s ease; /* Transición suave para la expansión al hover */
+    cursor: zoom-in; 
+    transition: transform 0.2s ease;
 }
 
-/* Opcional: Escalar ligeramente al pasar el mouse (si insistes en un efecto hover visible) */
 .product-item .main-image:hover {
-    transform: scale(1.03); /* Escala ligeramente la imagen */
+    transform: scale(1.03); 
 }
 
-
-.product-item .thumbnail-gallery { /* Contenedor para miniaturas */
+.product-item .thumbnail-gallery {
     display: flex;
     justify-content: center;
     gap: 5px;
     margin-bottom: 10px;
-    flex-wrap: wrap; /* Permite que las miniaturas se envuelvan */
+    flex-wrap: wrap; 
 }
 
 .product-item .thumbnail-gallery img {
-    width: 50px; /* Tamaño de las miniaturas */
+    width: 50px; 
     height: 50px;
     object-fit: cover;
     border: 1px solid var(--borde-claro);
@@ -140,18 +213,21 @@ h2, h3, h4 {
     border-color: var(--rosa-pastel);
 }
 
-
-.product-item h3 {
+.product-item h3 { /* Nombre del producto */
     color: var(--texto-oscuro);
     font-size: 1.2em;
-    margin-bottom: 5px;
+    margin-top: 10px; /* Espacio arriba del nombre del producto */
+    margin-bottom: 8px; /* Espacio debajo del nombre */
+    text-align: center; /* Asegurar centrado */
 }
 
-.product-item p {
+.product-item p { /* Descripción del producto */
     font-size: 0.9em;
     color: var(--texto-oscuro);
     margin-bottom: 10px;
-    flex-grow: 1; /* Permite que la descripción ocupe el espacio disponible */
+    flex-grow: 1; 
+    text-align: center; /* Asegurar centrado */
+    line-height: 1.4; /* Mejorar legibilidad */
 }
 
 .product-item .price {
@@ -161,83 +237,91 @@ h2, h3, h4 {
     margin-bottom: 15px;
 }
 
-.product-item button {
+.product-item button { /* Botón "Agregar al Carrito" */
     background-color: var(--lila-dulce);
     color: white;
     border: none;
-    padding: 8px 12px;
+    padding: 10px 15px; /* Padding un poco más generoso */
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-weight: bold;
 }
 
 .product-item button:hover {
     background-color: #B2A2FF;
 }
 
+.product-item button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 /* Estilos de los modales (general) */
 .modal {
-    display: none; /* Oculto por defecto */
-    position: fixed; /* Permanece fijo en la pantalla */
-    z-index: 1000; /* Mayor z-index para estar encima de todo */
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
     left: 0;
     top: 0;
-    width: 100%; /* Ancho completo */
-    height: 100%; /* Alto completo */
-    overflow: auto; /* Habilita el scroll si es necesario */
-    background-color: rgba(0,0,0,0.6); /* Fondo semi-transparente más oscuro */
-    /* display: flex; align-items: center; justify-content: center; */
-    /* Este display se activa y desactiva con JS para controlar la visibilidad */
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.7); /* Fondo más oscuro */
+    /* Para centrar el contenido del modal con Flex: */
+    /* El JS se encarga de añadir 'display: flex;' cuando se muestra */
+    align-items: center; 
+    justify-content: center;
 }
 
 .modal-content {
     background-color: white;
-    padding: 20px;
+    padding: 25px; /* Más padding */
     border: 1px solid var(--borde-claro);
     border-radius: 8px;
-    width: 90%; /* Ancho del contenido */
-    max-width: 600px; /* Max-width para el modal del carrito y pago */
+    width: 90%; 
+    max-width: 550px; /* Ancho máximo general para modales de contenido */
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    margin: 10% auto; /* Centrado vertical y horizontal cuando display no es flex */
+    /* margin: 10% auto; NO es necesario si se usa flex en .modal */
 }
 
-.image-modal-content { /* Estilos específicos para el modal de imagen */
-    max-width: 90vw; /* El ancho máximo del modal de imagen */
-    max-height: 90vh; /* El alto máximo del modal de imagen */
-    background-color: rgba(0,0,0,0); /* Fondo transparente para que solo se vea la imagen */
+.image-modal-content { 
+    max-width: 90vw; 
+    max-height: 90vh; 
+    background-color: transparent; 
     border: none;
     padding: 0;
     box-shadow: none;
-    margin: auto; /* Centrado para el modal de imagen */
+    /* margin: auto; NO es necesario si se usa flex en .modal */
 }
 
 #modal-image {
-    max-width: 100%; /* Asegura que la imagen no se desborde del modal */
-    max-height: 90vh; /* Asegura que la imagen no se desborde de la pantalla */
-    display: block; /* Elimina espacios extra bajo la imagen */
-    object-fit: contain; /* Ajusta la imagen sin recortarla */
+    max-width: 100%; 
+    max-height: calc(90vh - 40px); /* Dejar espacio para el botón de cerrar */
+    display: block; 
+    object-fit: contain; 
     border-radius: 5px;
 }
 
-
 .close-button {
-    color: white; /* Color blanco para el botón de cerrar en el modal de imagen */
-    position: absolute; /* Posicionamiento absoluto respecto al modal-content */
+    color: var(--texto-oscuro); /* Color estándar para la mayoría de los modales */
+    position: absolute; 
     top: 10px;
     right: 15px;
-    font-size: 35px; /* Más grande para que sea fácil de clickear */
+    font-size: 30px; 
     font-weight: bold;
     cursor: pointer;
-    text-shadow: 0px 0px 5px rgba(0,0,0,0.8); /* Sombra para que se vea en cualquier fondo */
-    z-index: 1001; /* Asegurar que esté encima de la imagen */
+    line-height: 1;
+    padding: 0 5px; /* Pequeño padding para facilitar el clic */
+    z-index: 1001;
+    text-shadow: none; /* Quitar sombra por defecto */
 }
 
-.cart-close, .payment-close { /* Botones de cerrar del carrito y pago vuelven a su color normal */
-    color: var(--texto-oscuro);
-    text-shadow: none;
-    top: 10px; /* Restablecer posición para el carrito */
-    right: 15px;
+.image-modal-content .close-button { /* Botón de cerrar específico para modal de imagen */
+    color: white;
+    text-shadow: 0px 0px 5px rgba(0,0,0,0.8); 
+    font-size: 35px;
 }
 
 .close-button:hover,
@@ -246,18 +330,22 @@ h2, h3, h4 {
     text-decoration: none;
 }
 
+/* Carrito */
 #cart-items {
     list-style: none;
     padding: 0;
     margin-top: 20px;
     border-top: 1px solid var(--borde-claro);
     padding-top: 10px;
+    max-height: 300px; /* Altura máxima para el listado del carrito */
+    overflow-y: auto; /* Scroll si hay muchos items */
 }
 
 #cart-items li {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
+    align-items: center; /* Alinear items verticalmente */
+    padding: 10px 0; /* Más padding vertical */
     border-bottom: 1px dashed var(--borde-claro);
 }
 
@@ -269,26 +357,186 @@ h2, h3, h4 {
     font-weight: bold;
     color: var(--cafe-claro);
     font-size: 1.2em;
+    margin-top: 15px; /* Espacio arriba del total */
+    display: block; /* Para que ocupe su línea */
+    text-align: right; /* Alinear total a la derecha */
 }
 
-#checkoutBtn {
+#checkoutBtn { /* Botón "Finalizar Compra" en el modal del carrito */
     background-color: var(--rosa-pastel);
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px; /* Padding más generoso */
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 20px;
+    margin-top: 25px; /* Más espacio arriba */
     font-size: 1.1em;
     transition: background-color 0.3s ease;
+    width: 100%; /* Ocupar todo el ancho */
+    box-sizing: border-box;
+    font-weight: bold;
 }
 
 #checkoutBtn:hover {
-    background-color: #E6B0C4; /* Un rosa un poco más oscuro */
+    background-color: #E6B0C4; 
+}
+
+#checkoutBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+/* Estilos para el Modal de Checkout (Formulario) */
+.checkout-modal-content { 
+    max-width: 500px; 
+}
+
+#checkout-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; 
+}
+
+#checkout-form h4 { /* Títulos dentro del formulario: "Tus Datos Personales", etc. */
+    margin-top: 15px; 
+    margin-bottom: 8px; 
+    text-align: left; 
+    color: var(--cafe-claro);
+    font-size: 1.1em; /* Ligeramente más pequeño que H3 general */
+    border-bottom: 1px solid var(--borde-claro); /* Línea separadora sutil */
+    padding-bottom: 5px; /* Espacio bajo la línea */
+}
+#checkout-form h4:first-of-type {
+    margin-top: 0; /* Sin margen superior para el primer H4 */
 }
 
 
-/* Estilos para la interfaz de administración */
+#checkout-form label {
+    font-weight: bold;
+    margin-bottom: -8px; 
+    font-size: 0.9em;
+    color: var(--texto-oscuro);
+}
+
+#checkout-form input[type="text"],
+#checkout-form input[type="tel"],
+#checkout-form textarea,
+#checkout-form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--borde-claro);
+    border-radius: 4px;
+    box-sizing: border-box; 
+    font-size: 1em;
+    background-color: #FFFFFF; /* Fondo blanco para todos los campos */
+    color: var(--texto-oscuro); 
+}
+
+#checkout-form select {
+    appearance: none; /* Quitar apariencia nativa para mejor estilo en algunos navegadores */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 12px auto;
+    padding-right: 30px; /* Espacio para la flecha personalizada */
+}
+
+
+#checkout-form select:invalid { 
+    color: #6c757d; 
+}
+
+#checkout-form select option { 
+    color: var(--texto-oscuro);
+    background-color: #FFFFFF; 
+}
+
+#checkout-form textarea {
+    resize: vertical; 
+    min-height: 80px; /* Altura mínima para el textarea */
+}
+
+#checkout-form button[type="submit"] { /* Botón "Confirmar y Enviar Pedido" */
+    background-color: var(--rosa-pastel);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    margin-top: 20px; /* Más espacio antes del botón final */
+    font-weight: bold;
+}
+
+#checkout-form button[type="submit"]:hover {
+    background-color: #E6B0C4; 
+}
+
+.info-text { /* Para el texto bajo el selector de envío */
+    font-size: 0.85em;
+    color: var(--texto-oscuro);
+    margin-top: -5px; 
+    margin-bottom: 10px; /* Más espacio después */
+    padding-left: 2px; /* Pequeña indentación */
+}
+
+/* Sección Contáctanos */
+.contact-section {
+    text-align: center;
+    padding: 40px 20px; /* Más padding vertical */
+    background-color: var(--beige-suave-mas-claro, #FDF5E6); 
+    margin-top: 40px; /* Más espacio arriba */
+    border-top: 2px solid var(--rosa-pastel);
+}
+
+.contact-section h2 { /* Título "Contáctanos" */
+    color: var(--cafe-claro);
+    margin-bottom: 30px; /* Más espacio bajo el título */
+    font-size: 1.8em; /* Tamaño del H2 de la sección */
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px; /* Más espacio entre logos */
+}
+
+.social-links a img {
+    width: 55px; /* Tamaño de los logos aumentado */
+    height: 55px; /* Tamaño de los logos aumentado */
+    transition: transform 0.2s ease-in-out, opacity 0.2s ease;
+    opacity: 0.9; /* Ligera transparencia inicial */
+}
+
+.social-links a img:hover {
+    transform: scale(1.15); 
+    opacity: 1; /* Opacidad completa al pasar el mouse */
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 25px 20px; /* Más padding */
+    background-color: var(--rosa-pastel);
+    color: var(--texto-oscuro);
+    font-size: 0.9em;
+    border-top: 3px solid var(--cafe-claro);
+    margin-top: 30px; /* Espacio si no hay sección de contacto directamente arriba */
+}
+
+.error { /* Mensaje de error (si se usa desde JS) */
+    color: var(--rosa-pastel);
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+/* Estilos comentados de la interfaz de administración (como los tenías) */
+/*
 #admin-login-area, #admin-panel-content {
     padding: 20px;
     border: 1px solid var(--borde-claro);
@@ -317,7 +565,7 @@ h2, h3, h4 {
 }
 
 #admin-login-area button:hover {
-    background-color: #A99081; /* Un café un poco más oscuro */
+    background-color: #A99081; 
 }
 
 #product-form {
@@ -354,7 +602,6 @@ h2, h3, h4 {
     background-color: #B2A2FF;
 }
 
-/* Estilos para las previsualizaciones de imágenes en el admin */
 .image-previews {
     display: flex;
     flex-wrap: wrap;
@@ -363,7 +610,7 @@ h2, h3, h4 {
     border: 1px dashed var(--borde-claro);
     padding: 10px;
     border-radius: 5px;
-    min-height: 50px; /* Para que siempre tenga un poco de espacio */
+    min-height: 50px; 
     align-items: center;
     justify-content: center;
 }
@@ -405,11 +652,10 @@ h2, h3, h4 {
     background-color: #E6B0C4;
 }
 
-/* Para que la lista de productos de administración no se limite a 3 */
 #admin-product-list {
     display: flex;
-    flex-direction: column; /* Apila los elementos uno debajo del otro */
-    gap: 15px; /* Espacio entre los elementos de la lista de admin */
+    flex-direction: column; 
+    gap: 15px; 
     margin-top: 20px;
 }
 
@@ -422,8 +668,8 @@ h2, h3, h4 {
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
-    width: 100%; /* Asegura que ocupe todo el ancho disponible */
-    box-sizing: border-box; /* Incluir padding y border en el width */
+    width: 100%; 
+    box-sizing: border-box; 
 }
 
 .admin-product-item .info {
@@ -463,116 +709,6 @@ h2, h3, h4 {
     background-color: #E6B0C4;
 }
 
-.error {
-    color: var(--rosa-pastel);
-    text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-}
-
-/* Estilos para el modal de pago */
-.payment-modal-content {
-    text-align: center;
-}
-
-.payment-options {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-top: 25px;
-}
-
-.payment-options button {
-    background-color: var(--lila-dulce);
-    color: white;
-    border: none;
-    padding: 15px 25px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1.2em;
-    transition: background-color 0.3s ease;
-    min-width: 150px; /* Para que los botones tengan un tamaño decente */
-}
-
-.payment-options button:hover {
-    background-color: #B2A2FF;
-}
-
-/* --- Estilos para los filtros de categoría (ACTUALIZADO) --- */
-.category-filters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: var(--lila-dulce); /* Color de fondo similar a los botones de navegación */
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.category-filters .filter-btn {
-    background-color: var(--lila-dulce); /* Mismo color de fondo que los botones de navegación */
-    color: white; /* Texto blanco */
-    border: none; /* Sin borde */
-    padding: 10px 15px; /* Padding similar a los botones de navegación */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer;
-    font-size: 1em; /* Tamaño de fuente estándar */
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Transiciones suaves */
-}
-
-.category-filters .filter-btn:hover {
-    background-color: #B2A2FF; /* Un lila un poco más oscuro al pasar el mouse */
-    transform: translateY(-2px); /* Ligero efecto de elevación al pasar el mouse */
-}
-
-.category-filters .filter-btn.active {
-    background-color: var(--rosa-pastel); /* Rosa pastel para la categoría activa */
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 0 8px rgba(0,0,0,0.2); /* Sombra para resaltar el activo */
-    transform: none; /* Deshabilita el efecto de elevación cuando está activo */
-}
-
-/* --- Estilos para los filtros de categoría --- */
-.category-filters {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    padding: 10px;
-    background-color: var(--lila-dulce);
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.category-filters .filter-btn {
-    background-color: var(--lila-dulce);
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1em;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-.category-filters .filter-btn:hover {
-    background-color: #B2A2FF;
-    transform: translateY(-2px);
-}
-
-.category-filters .filter-btn.active {
-    background-color: var(--rosa-pastel);
-    color: white;
-    font-weight: bold;
-    box-shadow: 0 0 8px rgba(0,0,0,0.2);
-    transform: none;
-}
-
-/* Estilos para el listado de categorías en el admin (estos ya deberían estar) */
 .admin-list-container {
     margin-top: 15px;
     max-height: 200px;
@@ -612,4 +748,35 @@ h2, h3, h4 {
 
 .admin-category-item .actions button:hover {
     opacity: 0.9;
+}
+*/
+
+/* Estilos del modal de pago (obsoleto, pero se deja por si hay referencias antiguas o se reutiliza) */
+.payment-modal-content { /* Este ID/clase se usaba para el modal de pago que fue reemplazado */
+    text-align: center;
+    /* Si .payment-modal-content es el mismo que .checkout-modal-content, estos estilos se aplicarán.
+       Si es un modal separado que ya no usas, puedes eliminar estos estilos. */
+}
+
+.payment-options { /* Usado en el modal de pago obsoleto */
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.payment-options button { /* Usado en el modal de pago obsoleto */
+    background-color: var(--lila-dulce);
+    color: white;
+    border: none;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease;
+    min-width: 150px;
+}
+
+.payment-options button:hover { /* Usado en el modal de pago obsoleto */
+    background-color: #B2A2FF;
 }

@@ -21,6 +21,11 @@
     <main>
         <section id="user-interface" class="interface active">
             <h2>Nuestros Productos</h2>
+            
+            <div class="search-container">
+                <input type="search" id="searchBar" placeholder="Buscar productos por nombre o descripción...">
+            </div>
+
             <div id="category-filters" class="category-filters">
                 <button class="filter-btn active" data-category="all">Todas las Categorías</button>
             </div>
@@ -33,7 +38,7 @@
                     <h3>Tu Carrito</h3>
                     <ul id="cart-items"></ul>
                     <p>Total: Q <span id="cart-total">0.00</span></p>
-                    <button id="checkoutBtn">Finalizar Compra</button>
+                    <button id="checkoutBtn">Finalizar Compra</button> {/* Este botón ahora abrirá el nuevo modal de checkout */}
                 </div>
             </div>
 
@@ -44,18 +49,67 @@
                 </div>
             </div>
 
-            <div id="payment-modal" class="modal">
-                <div class="modal-content payment-modal-content">
-                    <span class="close-button payment-close">&times;</span>
-                    <h3>Selecciona tu método de pago</h3>
-                    <div class="payment-options">
-                        <button id="payCashBtn">Efectivo</button>
-                        <button id="payTransferBtn">Transferencia</button>
-                    </div>
+            <div id="checkout-details-modal" class="modal">
+                <div class="modal-content checkout-modal-content"> {/* Añadida clase para estilos específicos */}
+                    <span class="close-button checkout-details-close">&times;</span>
+                    <h3>Completa los Detalles de tu Pedido</h3>
+                    <form id="checkout-form">
+                        <h4>Tus Datos Personales:</h4>
+                        <label for="customerName">Nombre Completo:</label>
+                        <input type="text" id="customerName" name="customerName" placeholder="Ej: Maria López" required>
+                        
+                        <label for="customerPhone">Número de Teléfono:</label>
+                        <input type="tel" id="customerPhone" name="customerPhone" placeholder="Ej: 55551234" required>
+                        
+                        <label for="customerAddress">Dirección de Envío Completa:</label>
+                        <textarea id="customerAddress" name="customerAddress" placeholder="Ej: 5ta Calle 10-50 Zona 1, Ciudad" rows="3" required></textarea>
+
+                        <h4>Método de Envío:</h4>
+                        <label for="shippingMethod">Selecciona una opción:</label>
+                        <select id="shippingMethod" name="shippingMethod" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="capital_35">Perímetro de la Capital - Q35.00</option>
+                            <option value="departamentos_cotizar">Otros departamentos - Previo a cotizar</option>
+                        </select>
+                        <p id="shippingCostInfo" class="info-text"></p>
+
+                        <h4>Método de Pago:</h4>
+                        <label for="paymentMethod">Selecciona una opción:</label>
+                        <select id="paymentMethod" name="paymentMethod" required>
+                            <option value="">-- Selecciona --</option>
+                            <option value="Efectivo">Efectivo</option>
+                            <option value="Transferencia">Transferencia Bancaria</option>
+                        </select>
+                        
+                        <button type="submit" id="confirmOrderBtn">Confirmar y Enviar Pedido</button>
+                    </form>
                 </div>
+            </div>
+            
+            </section>
+        
+        <section id="contact-us" class="contact-section">
+            <h2>Contáctanos</h2>
+            <div class="social-links">
+                <a href="https://www.instagram.com/ayd.suministros.de.reposteria/" target="_blank" aria-label="Instagram de A&D Suministros">
+                    <img src="instagram.png" alt="Instagram A&D Suministros"> 
+                </a>
+                <a href="https://www.facebook.com/ayd.suministros.de.reposteria" target="_blank" aria-label="Facebook de A&D Suministros">
+                    <img src="facebook.png" alt="Facebook A&D Suministros"> 
+                </a>
+                <a href="#" id="tiktok-link" target="_blank" aria-label="TikTok de A&D Suministros (pendiente)">
+                    <img src="tiktok.png" alt="TikTok A&D Suministros">
+                </a>
+                <a href="https://wa.me/50237943687" target="_blank" aria-label="WhatsApp de A&D Suministros">
+                    <img src="whatsapp.png" alt="WhatsApp A&D Suministros"> 
+                </a>
             </div>
         </section>
     </main>
+    
+    <footer>
+        <p>&copy; <span id="currentYear"></span> A&D Suministros de Repostería y Panadería. Todos los derechos reservados.</p>
+    </footer>
 
     <script src="script.js"></script>
 </body>

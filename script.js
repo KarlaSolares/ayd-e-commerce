@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // --- Elementos del DOM (igual que antes) ---
-    // ... (copia esta sección de la respuesta anterior)
+    // ... (mantener los elementos del DOM)
     const userInterface = document.getElementById('user-interface');
     const viewCartBtn = document.getElementById('viewCartBtn');
     const cartModal = document.getElementById('cart-modal');
@@ -12,15 +12,24 @@ document.addEventListener('DOMContentLoaded', async () => {
     const imageModal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
     const closeImageModalBtn = document.querySelector('.image-close');
-    const paymentModal = document.getElementById('payment-modal');
-    const closePaymentModalBtn = document.querySelector('.payment-close');
-    const payCashBtn = document.getElementById('payCashBtn');
-    const payTransferBtn = document.getElementById('payTransferBtn');
-    const categoryFiltersDiv = document.getElementById('category-filters');
+    
+    const checkoutDetailsModal = document.getElementById('checkout-details-modal');
+    const closeCheckoutDetailsBtn = document.querySelector('.checkout-details-close');
+    const checkoutForm = document.getElementById('checkout-form');
+    const shippingMethodSelect = document.getElementById('shippingMethod');
+    const shippingCostInfoP = document.getElementById('shippingCostInfo');
 
-    // --- Configuración de Storyblok (igual que antes) ---
-    const STORYBLOK_ACCESS_TOKEN = 'B6EQn2DCY3QRavyzoF9I7gtt';
-    const WHATSAPP_PHONE = '50237943687';
+    const categoryFiltersDiv = document.getElementById('category-filters');
+    const searchBar = document.getElementById('searchBar');
+    
+    if (document.getElementById('currentYear')) {
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    }
+
+    // --- Configuración ---
+    const STORYBLOK_ACCESS_TOKEN = 'B6EQn2DCY3QRavyzoF9I7gtt'; // ¡REEMPLAZA ESTO!
+    const WHATSAPP_ORDER_NUMBER = '50237943687'; // Número para enviar pedidos por WhatsApp
+
     const sb = window.storyblok;
     let storyblokApi;
 
@@ -28,15 +37,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const { storyblokApi: api } = sb.storyblokInit({
             accessToken: STORYBLOK_ACCESS_TOKEN,
             use: [sb.apiPlugin],
-            apiOptions: {
-                cache: { type: 'memory', clear: 'auto' },
-                // region: 'eu', 
-            }
+            apiOptions: { cache: { type: 'memory', clear: 'auto' } }
         });
         storyblokApi = api;
     } else {
-        console.error("Storyblok SDK no se cargó correctamente.");
-        productListDiv.innerHTML = '<p style="text-align: center; color: var(--rosa-pastel);">Error: Storyblok SDK no pudo cargarse.</p>';
+        console.error("Storyblok SDK no se cargó.");
+        if(productListDiv) productListDiv.innerHTML = '<p style="color:red;">Error: Storyblok SDK no pudo cargarse.</p>';
         return;
     }
 
@@ -45,23 +51,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     let categories = [];
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     let currentFilterCategory = 'all';
+    let searchTerm = '';
 
-    // --- Funciones Auxiliares (showInterface, saveCart - igual que antes) ---
+    // --- Funciones Auxiliares, de Storyblok y de Renderizado (sin cambios respecto a la última versión) ---
+    // ... (copia aquí las funciones: showInterface, saveCart, fetchCategoriesFromStoryblok, 
+    // fetchProductsFromStoryblok, renderProducts, renderCategoryFilters, addToCart, updateCartDisplay)
+
     function showInterface(interfaceToShow) {
-        // ... (código igual que antes)
         if (document.getElementById('user-interface')) document.getElementById('user-interface').classList.remove('active');
         interfaceToShow.classList.add('active');
     }
 
     function saveCart() {
-        // ... (código igual que antes)
         localStorage.setItem('cart', JSON.stringify(cart));
         updateCartDisplay();
     }
 
-    // --- Funciones para obtener datos de Storyblok ---
-    
-    // fetchCategoriesFromStoryblok sigue igual
     async function fetchCategoriesFromStoryblok() {
         if (!storyblokApi) return [];
         try {
@@ -69,88 +74,73 @@ document.addEventListener('DOMContentLoaded', async () => {
                 content_type: 'category',
                 version: 'published'
             });
-            console.log("Categorías desde Storyblok:", data.stories);
-            return data.stories.map(story => ({
-                id: story.uuid,
-                name: story.content.name
-            }));
+            return data.stories.map(story => ({ id: story.uuid, name: story.content.name }));
         } catch (error) {
-            console.error('Error fetching categories from Storyblok:', error);
-            categoryFiltersDiv.innerHTML = '<p style="text-align: center; color: var(--rosa-pastel);">Error al cargar categorías.</p>';
+            console.error('Error fetching categories:', error);
             return [];
         }
     }
 
-    // MODIFICACIÓN AQUÍ: fetchProductsFromStoryblok para manejar múltiples categorías
     async function fetchProductsFromStoryblok() {
         if (!storyblokApi) return [];
         try {
             const { data } = await storyblokApi.get('cdn/stories', {
                 content_type: 'product',
-                // resolve_relations debería funcionar para campos Multi-Options que referencian stories.
-                // Se espera que story.content.category_ref sea un array de objetos de categoría resueltos.
-                resolve_relations: 'product.category_ref', 
+                resolve_relations: 'product.category_ref',
                 version: 'published'
             });
-            console.log("Productos desde Storyblok (con posible array de categorías):", data.stories);
             return data.stories.map(story => {
-                // Procesar el array de referencias de categoría
                 const categoryNames = (story.content.category_ref && Array.isArray(story.content.category_ref))
                     ? story.content.category_ref
-                        // Mapear cada referencia resuelta a su nombre de categoría
                         .map(ref => (ref && ref.content && ref.content.name) ? ref.content.name : null)
-                        // Filtrar cualquier nulo (si una referencia no se resolvió o no tenía nombre)
                         .filter(name => name !== null)
-                    : []; // Si no hay category_ref o no es un array, lista vacía
-
+                    : [];
                 return {
                     id: story.uuid,
                     name: story.content.name,
                     description: story.content.description || '',
                     price: parseFloat(story.content.price) || 0,
                     stock: parseInt(story.content.stock) || 0,
-                    // NUEVO: Almacena un array de nombres de categoría
-                    category_names: categoryNames, 
+                    category_names: categoryNames,
                     images: story.content.images ? story.content.images.map(img => img.filename) : [],
                     originalStock: parseInt(story.content.stock) || 0
                 };
             });
         } catch (error) {
-            console.error('Error fetching products from Storyblok:', error);
-            productListDiv.innerHTML = '<p style="text-align: center; color: var(--rosa-pastel);">Error al cargar productos. Revisa la consola y tu configuración.</p>';
+            console.error('Error fetching products:', error);
             return [];
         }
     }
-
-    // --- Funciones de Renderizado ---
-
-    // MODIFICACIÓN AQUÍ: renderProducts para filtrar por array de categorías
+    
     function renderProducts() {
+        if (!productListDiv) return;
         productListDiv.innerHTML = '';
+        let productsToDisplay = [...products]; 
 
-        // Filtrar productos: si 'all', mostrar todos.
-        // Si hay una categoría seleccionada, mostrar productos cuyo array 'category_names' INCLUYA esa categoría.
-        const filteredProducts = currentFilterCategory === 'all'
-            ? products
-            : products.filter(p => p.category_names && p.category_names.includes(currentFilterCategory));
+        if (currentFilterCategory !== 'all') {
+            productsToDisplay = productsToDisplay.filter(p => p.category_names && p.category_names.includes(currentFilterCategory));
+        }
 
-        // ... (el resto de la lógica de renderProducts para mensajes de error y creación de items es igual que antes)
-        if (filteredProducts.length === 0 && products.length > 0) {
-            productListDiv.innerHTML = '<p style="text-align: center;">No hay productos disponibles en esta categoría.</p>';
-            return;
+        if (searchTerm) {
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            productsToDisplay = productsToDisplay.filter(p =>
+                p.name.toLowerCase().includes(lowerSearchTerm) ||
+                (p.description && p.description.toLowerCase().includes(lowerSearchTerm))
+            );
         }
-        if (products.length === 0 && (!STORYBLOK_ACCESS_TOKEN || STORYBLOK_ACCESS_TOKEN === 'TU_ACCESS_TOKEN_DE_PREVISUALIZACION') ) {
-             productListDiv.innerHTML = `<p style="text-align: center; color: var(--rosa-pastel);">Por favor, configura tu Access Token de Storyblok en <code>script.js</code>.</p>`;
-            return;
-        }
-        if (filteredProducts.length === 0 && products.length === 0) {
-            if (productListDiv.innerHTML === '') { 
-                 productListDiv.innerHTML = '<p style="text-align: center;">No hay productos para mostrar. Verifica que tengas productos y categorías publicados en Storyblok.</p>';
+
+        if (productsToDisplay.length === 0) {
+            let message = "No se encontraron productos que coincidan con tu búsqueda o filtros.";
+            if (products.length === 0 && (!STORYBLOK_ACCESS_TOKEN || STORYBLOK_ACCESS_TOKEN === 'TU_ACCESS_TOKEN_DE_PREVISUALIZACION')) {
+                message = `<p style="color:var(--rosa-pastel);">Por favor, configura tu Access Token de Storyblok en <code>script.js</code>.</p>`;
+            } else if (products.length === 0) {
+                message = "No hay productos cargados. Verifica tu conexión y la configuración de Storyblok.";
             }
+            productListDiv.innerHTML = `<p style="text-align:center;">${message}</p>`;
             return;
         }
 
-        filteredProducts.forEach(product => {
+        productsToDisplay.forEach(product => {
             const productItem = document.createElement('div');
             productItem.classList.add('product-item');
             const mainImageUrl = product.images && product.images.length > 0 
@@ -163,12 +153,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const buttonText = isOutOfStock ? 'AGOTADO' : 'Agregar al Carrito';
             const buttonDisabled = isOutOfStock ? 'disabled' : '';
 
-            // Mostrar categorías del producto (opcional, como ejemplo)
-            // const categoriesText = product.category_names && product.category_names.length > 0 
-            //                       ? `Categorías: ${product.category_names.join(', ')}` 
-            //                       : 'Sin categoría asignada';
-            const formatedPrice = product.price/100;
-
             productItem.innerHTML = `
                 <img src="${mainImageUrl}" alt="${product.name}" class="main-image" data-full-image="${mainImageUrl}">
                 <div class="thumbnail-gallery">
@@ -178,38 +162,40 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
-                <p class="price">Q ${formatedPrice.toFixed(2)}</p>
+                <p class="price">Q ${product.price.toFixed(2)}</p>
                 <button data-id="${product.id}" ${buttonDisabled}>${buttonText}</button>
             `;
             productListDiv.appendChild(productItem);
 
             const mainImageElement = productItem.querySelector('.main-image');
+            if (mainImageElement){
+                mainImageElement.addEventListener('click', (event) => {
+                    const fullImageUrl = event.target.dataset.fullImage;
+                    if (fullImageUrl && modalImage && imageModal) {
+                        modalImage.src = fullImageUrl;
+                        imageModal.style.display = 'flex';
+                    }
+                });
+            }
             productItem.querySelectorAll('.thumbnail-gallery img').forEach(thumbnail => {
                 thumbnail.addEventListener('click', (event) => {
-                    mainImageElement.src = event.target.dataset.mainSrc;
-                    mainImageElement.dataset.fullImage = event.target.dataset.fullImage;
+                     if (mainImageElement) {
+                        mainImageElement.src = event.target.dataset.mainSrc;
+                        mainImageElement.dataset.fullImage = event.target.dataset.fullImage;
+                    }
                 });
-            });
-            mainImageElement.addEventListener('click', (event) => {
-                const fullImageUrl = event.target.dataset.fullImage;
-                if (fullImageUrl) {
-                    modalImage.src = fullImageUrl;
-                    imageModal.style.display = 'flex';
-                }
             });
         });
 
         document.querySelectorAll('#product-list .product-item button').forEach(button => {
             button.addEventListener('click', (event) => {
-                const productId = event.target.dataset.id;
-                addToCart(productId);
+                addToCart(event.target.dataset.id);
             });
         });
     }
-    
-    // renderCategoryFilters sigue igual
+
     function renderCategoryFilters() {
-        // ... (código igual que antes)
+        if (!categoryFiltersDiv) return;
         categoryFiltersDiv.innerHTML = '';
         const allButton = document.createElement('button');
         allButton.classList.add('filter-btn');
@@ -237,9 +223,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // --- Funcionalidades del Carrito (addToCart, updateCartDisplay - igual que antes) ---
     function addToCart(productId) {
-        // ... (código igual que antes)
         const productToAdd = products.find(p => p.id === productId);
         if (!productToAdd) {
             alert("Producto no encontrado.");
@@ -268,7 +252,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateCartDisplay() {
-        // ... (código igual que antes)
+        if (!cartItemsList || !cartTotalSpan || !checkoutBtn) return;
+
         cartItemsList.innerHTML = '';
         let total = 0;
         if (cart.length === 0) {
@@ -285,97 +270,180 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         cartTotalSpan.textContent = total.toFixed(2);
+        checkoutBtn.disabled = cart.length === 0;
     }
 
-    // --- Flujo de compra (generateWhatsAppMessage, finalizeOrder - igual que antes) ---
-    function generateWhatsAppMessage(method) {
-        // ... (código igual que antes)
-        let message = `¡Hola! He realizado un pedido en A&D Suministros de Repostería y Panadería.\n\n`;
-        message += `Detalle del Pedido:\n`;
-        let total = 0;
-        cart.forEach(item => {
-            message += `- ${item.name} (x${item.quantity}) - Q${(item.price * item.quantity).toFixed(2)}\n`;
-            total += item.price * item.quantity;
+    // --- Lógica de Checkout y Envío por WhatsApp (MODIFICADO) ---
+    function generateOrderMessageForWhatsApp(details) {
+        let message = `¡Nuevo Pedido A&D Suministros!\n\n`;
+        message += `👤 *CLIENTE:*\n`;
+        message += `  Nombre: ${details.customerName}\n`;
+        message += `  Teléfono: ${details.customerPhone}\n`;
+        message += `  Dirección: ${details.customerAddress}\n\n`;
+
+        message += `🛒 *DETALLE DEL PEDIDO:*\n`;
+        let subtotalPedido = 0;
+        details.cart.forEach(item => {
+            message += `  - ${item.name} (Cant: ${item.quantity}) - Q${(item.price * item.quantity).toFixed(2)}\n`;
+            subtotalPedido += item.price * item.quantity;
         });
-        message += `\nTotal: Q${total.toFixed(2)}\n`;
-        message += `Método de Pago: ${method}\n\n`;
-        message += `¡Gracias!`;
-        const encodedMessage = encodeURIComponent(message);
-        return `https://wa.me/${WHATSAPP_PHONE}?text=${encodedMessage}`;
+        message += `\n  *Subtotal:* Q${subtotalPedido.toFixed(2)}\n`;
+
+        let costoEnvio = 0;
+        let costoEnvioTexto = "No aplica";
+        if (details.shippingMethodValue === 'capital_35') {
+            costoEnvio = 35;
+            costoEnvioTexto = `Q${costoEnvio.toFixed(2)}`;
+        } else if (details.shippingMethodValue === 'departamentos_cotizar') {
+            costoEnvioTexto = "A cotizar";
+        }
+        message += `  *Envío (${details.shippingMethodText}):* ${costoEnvioTexto}\n`;
+        
+        const granTotal = subtotalPedido + costoEnvio;
+        message += `\n💰 *TOTAL PEDIDO:* Q${granTotal.toFixed(2)} ${details.shippingMethodValue === 'departamentos_cotizar' ? '(Envío pendiente cotización)' : ''}\n\n`;
+        
+        message += `🚚 *MÉTODO DE ENVÍO:*\n  ${details.shippingMethodText}\n\n`;
+        message += `💳 *MÉTODO DE PAGO:*\n  ${details.paymentMethod}\n\n`;
+        message += `Por favor, confirmar y coordinar.`;
+
+        return encodeURIComponent(message);
     }
 
-    function finalizeOrder(paymentMethod) {
-        // ... (código igual que antes)
-        if (cart.length === 0) {
-            alert('Tu carrito está vacío. No se puede finalizar la compra.');
-            return;
-        }
-        const whatsappLink = generateWhatsAppMessage(paymentMethod);
+    function sendOrderByWhatsApp(details) {
+        const whatsappNumber = WHATSAPP_ORDER_NUMBER;
+        const message = generateOrderMessageForWhatsApp(details);
+        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
+        
         window.open(whatsappLink, '_blank');
+
+        // Limpiar y resetear
         cart = [];
         saveCart(); 
-        renderProducts(); 
-        cartModal.style.display = 'none';
-        paymentModal.style.display = 'none';
+        renderProducts();
+        
+        if(checkoutDetailsModal) checkoutDetailsModal.style.display = 'none';
+        if(checkoutForm) checkoutForm.reset();
+        if(shippingCostInfoP) shippingCostInfoP.textContent = '';
+
         alert('Serás redirigido a WhatsApp para enviar tu pedido. ¡Gracias por tu compra!');
     }
 
-    // --- Event Listeners Globales (igual que antes) ---
-    viewCartBtn.addEventListener('click', () => { /* ... */ });
-    // ... (copia el resto de los event listeners de la respuesta anterior)
-    viewCartBtn.addEventListener('click', () => {
-        cartModal.style.display = 'flex';
-        updateCartDisplay();
-    });
-    closeCartBtn.addEventListener('click', () => cartModal.style.display = 'none');
-    closeImageModalBtn.addEventListener('click', () => {
-        imageModal.style.display = 'none';
-        modalImage.src = '';
-    });
-    closePaymentModalBtn.addEventListener('click', () => paymentModal.style.display = 'none');
-    checkoutBtn.addEventListener('click', () => {
-        if (cart.length === 0) {
-            alert('Tu carrito está vacío.');
-            return;
-        }
-        cartModal.style.display = 'none';
-        paymentModal.style.display = 'flex';
-    });
-    payCashBtn.addEventListener('click', () => finalizeOrder('Efectivo'));
-    payTransferBtn.addEventListener('click', () => finalizeOrder('Transferencia'));
-    window.addEventListener('click', (event) => {
-        if (event.target === cartModal) cartModal.style.display = 'none';
-        if (event.target === imageModal) {
-            imageModal.style.display = 'none';
-            modalImage.src = '';
-        }
-        if (event.target === paymentModal) paymentModal.style.display = 'none';
+
+    // --- Event Listeners (Ajustados para el nuevo flujo de WhatsApp) ---
+    if (viewCartBtn) {
+        viewCartBtn.addEventListener('click', () => {
+            if (cartModal) cartModal.style.display = 'flex';
+            updateCartDisplay();
+        });
+    }
+    if (closeCartBtn) closeCartBtn.addEventListener('click', () => {
+        if (cartModal) cartModal.style.display = 'none';
     });
 
-    // --- Inicialización (igual que antes) ---
+    if (checkoutBtn) { 
+        checkoutBtn.addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Tu carrito está vacío. Agrega productos antes de finalizar la compra.');
+                return;
+            }
+            if (cartModal) cartModal.style.display = 'none';
+            if (checkoutDetailsModal) checkoutDetailsModal.style.display = 'flex';
+        });
+    }
+    
+    if (closeCheckoutDetailsBtn) {
+        closeCheckoutDetailsBtn.addEventListener('click', () => {
+            if (checkoutDetailsModal) checkoutDetailsModal.style.display = 'none';
+        });
+    }
+
+    if (shippingMethodSelect) {
+        shippingMethodSelect.addEventListener('change', function() {
+            if (!shippingCostInfoP) return;
+            if (this.value === 'capital_35') {
+                shippingCostInfoP.textContent = 'Costo de envío aplicable: Q35.00';
+            } else if (this.value === 'departamentos_cotizar') {
+                shippingCostInfoP.textContent = 'El costo de envío se cotizará y confirmará por separado.';
+            } else {
+                shippingCostInfoP.textContent = '';
+            }
+        });
+    }
+
+    if (checkoutForm) {
+        checkoutForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            if (cart.length === 0) {
+                alert('Error: El carrito está vacío.');
+                return;
+            }
+            const customerName = document.getElementById('customerName').value;
+            const customerPhone = document.getElementById('customerPhone').value;
+            const customerAddress = document.getElementById('customerAddress').value;
+            const shippingSelect = document.getElementById('shippingMethod');
+            const shippingMethodValue = shippingSelect.value;
+            const shippingMethodText = shippingSelect.options[shippingSelect.selectedIndex].text;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+
+            // Llamar a la función de WhatsApp en lugar de la de correo
+            sendOrderByWhatsApp({
+                customerName,
+                customerPhone,
+                customerAddress,
+                shippingMethodValue,
+                shippingMethodText,
+                paymentMethod,
+                cart: [...cart] 
+            });
+        });
+    }
+    
+    if (searchBar) {
+        searchBar.addEventListener('input', (event) => {
+            searchTerm = event.target.value; 
+            renderProducts();
+        });
+    }
+
+    if(closeImageModalBtn) {
+        closeImageModalBtn.addEventListener('click', () => {
+            if(imageModal) imageModal.style.display = 'none';
+            if(modalImage) modalImage.src = '';
+        });
+    }
+
+    window.addEventListener('click', (event) => {
+        if (cartModal && event.target === cartModal) cartModal.style.display = 'none';
+        if (imageModal && event.target === imageModal) {
+            imageModal.style.display = 'none';
+            if(modalImage) modalImage.src = '';
+        }
+        if (checkoutDetailsModal && event.target === checkoutDetailsModal) checkoutDetailsModal.style.display = 'none';
+    });
+
+    // --- Inicialización ---
     async function initializeApp() {
-        // ... (código igual que antes)
-        if (!storyblokApi) { 
+        if (!storyblokApi) {
+            console.error("Fallo en la inicialización de Storyblok API.");
             return;
         }
         if (!STORYBLOK_ACCESS_TOKEN || STORYBLOK_ACCESS_TOKEN === 'TU_ACCESS_TOKEN_DE_PREVISUALIZACION') {
             console.error("Storyblok Access Token no configurado.");
-            productListDiv.innerHTML = '<p style="text-align: center; color: var(--rosa-pastel);">Error: Falta el Access Token de Storyblok.</p>';
-            categoryFiltersDiv.innerHTML = '';
+            if(productListDiv) productListDiv.innerHTML = '<p style="color:red;">Error: Falta el Access Token de Storyblok.</p>';
             return;
         }
         
         categories = await fetchCategoriesFromStoryblok();
         products = await fetchProductsFromStoryblok();
         
-        renderCategoryFilters(); 
-        renderProducts();       
-        updateCartDisplay();    
+        renderCategoryFilters();
+        renderProducts();
+        updateCartDisplay(); 
         
-        showInterface(userInterface); 
-        if (cartModal) cartModal.style.display = 'none'; 
+        if (userInterface) showInterface(userInterface); // Solo si userInterface existe
+        if (cartModal) cartModal.style.display = 'none';
         if (imageModal) imageModal.style.display = 'none';
-        if (paymentModal) paymentModal.style.display = 'none';
+        if (checkoutDetailsModal) checkoutDetailsModal.style.display = 'none';
     }
 
     initializeApp();
