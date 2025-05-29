@@ -161,7 +161,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     `).join('')}
                 </div>
                 <h3>${product.name}</h3>
-                <p>${product.description}</p>
+                <zero-md>
+                <script type="text/markdown">
+                ${dedent(product.description)}       
+                </script>
+                </zero-md>
                 <p class="price">Q ${product.price.toFixed(2)}</p>
                 <button data-id="${product.id}" ${buttonDisabled}>${buttonText}</button>
             `;
@@ -448,3 +452,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initializeApp();
 });
+
+function dedent(str) {
+    if (!str) return '';
+    const lines = str.split('\n');
+    let minIndent = Infinity;
+
+    // First, find the minimum indentation, ignoring fully blank lines
+    for (const line of lines) {
+        if (line.trim() === '') continue; // Skip empty lines for indent calculation
+        const leadingSpace = line.match(/^\s*/)[0].length;
+        if (leadingSpace < minIndent) {
+            minIndent = leadingSpace;
+        }
+    }
+
+    // If all lines are blank or there's no common indentation
+    if (minIndent === Infinity || minIndent === 0) {
+        return str;
+    }
+
+    // Remove the common leading whitespace
+    return lines.map(line => line.substring(minIndent)).join('\n');
+}
+
+// Then you would use it like this in your template:
+// <script type="text/markdown">
+// ${dedent(product.description).trim()}
+// </script>
+// Note: .trim() after dedent can clean up any leftover blank lines at start/end.
